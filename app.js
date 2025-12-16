@@ -1,5 +1,6 @@
-const storageKey = "priorityPilotTasks";
 let tasks = [];
+const storageKey = "priorityPilotTasks";
+
 let contextState = { time: "15", energy: "high", location: "any" };
 let focusState = { taskId: null, timerId: null, remaining: 0, running: false };
 
