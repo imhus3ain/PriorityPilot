@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PriorityPilot | AI-Powered Task Prioritization</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="brand">
+        <div class="brand-mark">PP</div>
+        <div>
+          <h1>PriorityPilot</h1>
+          <p class="subtitle">Beat decision paralysis with AI-smart priorities.</p>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <button class="ghost-btn" id="focusToggle">Focus Mode</button>
+        <button class="primary-btn" id="showPriorities">Show My Priorities Now</button>
+      </div>
+    </header>
+
+    <section class="toolbar">
+      <div class="toolbar-group">
+        <label>Time Available</label>
+        <div class="chip-group" id="timeChips">
+          <button class="chip active" data-value="15">15 min</button>
+          <button class="chip" data-value="30">30 min</button>
+          <button class="chip" data-value="60">1 hr</button>
+          <button class="chip" data-value="120">2 hr+</button>
+        </div>
+      </div>
+      <div class="toolbar-group">
+        <label>Energy</label>
+        <div class="chip-group" id="energyChips">
+          <button class="chip active" data-value="high">High</button>
+          <button class="chip" data-value="medium">Medium</button>
+          <button class="chip" data-value="low">Low</button>
+        </div>
+      </div>
+      <div class="toolbar-group">
+        <label>Location</label>
+        <div class="chip-group" id="locationChips">
+          <button class="chip active" data-value="any">Any</button>
+          <button class="chip" data-value="office">Office</button>
+          <button class="chip" data-value="home">Home</button>
+          <button class="chip" data-value="mobile">Mobile</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card input-card">
+        <div class="card-header">
+          <div>
+            <p class="eyebrow">Add Tasks</p>
+            <h2>Capture what matters</h2>
+          </div>
+          <div class="pulse-dot"></div>
+        </div>
+        <form id="taskForm">
+          <div class="form-grid">
+            <label class="field">
+              <span>Task title</span>
+              <input required id="title" type="text" placeholder="Write the proposal draft">
+            </label>
+            <label class="field">
+              <span>Estimated time</span>
+              <select id="eta">
+                <option value="5">5 min</option>
+                <option value="15">15 min</option>
+                <option value="30" selected>30 min</option>
+                <option value="45">45 min</option>
+                <option value="60">1 hr</option>
+                <option value="90">1.5 hrs</option>
+                <option value="120">2 hrs</option>
+                <option value="180">3 hrs</option>
+                <option value="240">4 hrs</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Deadline (optional)</span>
+              <input id="deadline" type="datetime-local">
+            </label>
+            <div class="field impact-field">
+              <span>Impact level</span>
+              <div class="chip-group" id="impactButtons">
+                <button type="button" class="chip ghost active" data-impact="High">High</button>
+                <button type="button" class="chip ghost" data-impact="Medium">Medium</button>
+                <button type="button" class="chip ghost" data-impact="Low">Low</button>
+              </div>
+            </div>
+            <div class="field effort-field">
+              <span>Effort rating</span>
+              <div class="stars" id="effortStars" role="radiogroup" aria-label="Effort rating">
+                <button type="button" data-value="1" class="star active">★</button>
+                <button type="button" data-value="2" class="star active">★</button>
+                <button type="button" data-value="3" class="star">★</button>
+                <button type="button" data-value="4" class="star">★</button>
+                <button type="button" data-value="5" class="star">★</button>
+              </div>
+            </div>
+            <label class="field full">
+              <span>Notes (optional)</span>
+              <textarea id="notes" rows="2" placeholder="Context, deliverables, links..."></textarea>
+            </label>
+            <label class="field full">
+              <span>Dependencies (select blockers)</span>
+              <select id="dependencies" multiple></select>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="primary-btn">Add Task</button>
+            <button type="reset" class="ghost-btn">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card stats-card">
+        <div class="card-header">
+          <div>
+            <p class="eyebrow">Today</p>
+            <h2>Progress radar</h2>
+          </div>
+          <div class="mini-badge">AI Assist</div>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <p class="stat-value" id="completedCount">0</p>
+            <p class="stat-label">Completed today</p>
+          </div>
+          <div class="stat">
+            <p class="stat-value" id="remainingCount">0</p>
+            <p class="stat-label">Active tasks</p>
+          </div>
+          <div class="stat">
+            <p class="stat-value" id="quickWins">0</p>
+            <p class="stat-label">Quick wins</p>
+          </div>
+        </div>
+        <div class="suggestions">
+          <div class="suggestion-title">Suggestions</div>
+          <ul id="suggestionList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="priority-area">
+      <div class="priority-header">
+        <div>
+          <p class="eyebrow">AI-Powered Priority Ranking</p>
+          <h2>Today's Top 5</h2>
+        </div>
+        <div class="legend">
+          <span class="legend-dot due"></span>Due soon
+          <span class="legend-dot impact"></span>High impact
+          <span class="legend-dot quick"></span>Quick win
+        </div>
+      </div>
+      <div class="list-grid">
+        <div class="card list-card">
+          <div id="priorityList" class="priority-list"></div>
+          <div class="parked">
+            <div class="parked-header">
+              <p class="eyebrow">Parked for later</p>
+              <span class="muted">Context mismatch tasks</span>
+            </div>
+            <div id="parkedList" class="parked-list"></div>
+          </div>
+        </div>
+        <div class="card focus-card" id="focusPanel">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">Focus Mode</p>
+              <h3 id="focusTitle">Pick a task to focus</h3>
+            </div>
+            <div class="focus-status" id="focusStatus">Idle</div>
+          </div>
+          <p id="focusReason" class="muted">The top-ranked task will land here with a timer.</p>
+          <div class="focus-meta">
+            <div>
+              <p class="mini-label">Estimate</p>
+              <p id="focusEta">—</p>
+            </div>
+            <div>
+              <p class="mini-label">Impact</p>
+              <p id="focusImpact">—</p>
+            </div>
+            <div>
+              <p class="mini-label">Deadline</p>
+              <p id="focusDeadline">—</p>
+            </div>
+          </div>
+          <div class="timer">
+            <p class="mini-label">Timer</p>
+            <div class="timer-display" id="timerDisplay">00:00</div>
+            <div class="timer-actions">
+              <button class="primary-btn" id="startTimer">Start</button>
+              <button class="ghost-btn" id="pauseTimer">Pause</button>
+              <button class="ghost-btn" id="resetTimer">Reset</button>
+            </div>
+          </div>
+          <div class="focus-actions">
+            <button class="primary-btn" id="completeFocus">Mark Complete</button>
+            <button class="ghost-btn" id="deferFocus">Defer</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
